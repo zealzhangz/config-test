@@ -60,6 +60,25 @@ spring.application.name
 spring.cloud.config.server.git.uri
 ```
 
+### 问题
+
+```
+    nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'auth.mode' in value "${auth.mode}"
+```
+原因是因为，`Config Client` 中的 `cloud.config.uri` 应该加在 `bootstrap.yml` 中。程序启动时会首先去`bootstrap.yml` 找 `cloud.config.uri`，找不到就使用默认值 `http://localhost:8888`.
+
+如下有两个解决办法：
+1. 新建 `bootstrap.yml` 文件并加入 `cloud.config.uri`，这是最通用的办法，但是要多管理`bootstrap.yml`这个文件，启动指定配置文件时，可能需要指定多个文件（未经实际验证）
+
+    ```bash
+        #参考地址（https://stackoverflow.com/questions/25855795/spring-boot-and-multiple-external-configuration-files）
+        # 直接指定目录，目录中包含多个配置
+        -Dspring.config.location=your/config/dir/
+        # 直接指定多个配置
+        -Dspring.config.location=classpath:job1.properties,classpath:job2.properties
+    ```
+2. `Config Server` 服务的地址端口直接使用默认的 `http://localhost:8888`，这样就不用多添加 `bootstrap.yml` 文件，但是当 `Config Server` 地址不能使用localhost，端口不能使用8888时，就比较麻烦，这时最直接的办法是把 `application.yml` 名字改为 `bootstrap.yml` 然后自定义 `cloud.config.uri` 所要的值。这种方法不太通用，建议还是使用方法一。
+
 ## 不同位置的配置文件的加载顺序
 
 > SpringApplication will load properties from application.properties files in the following locations and add them to the Spring Environment
@@ -83,3 +102,4 @@ spring.cloud.config.server.git.uri
 最下层的优先加载，所以最上层的属性会覆盖下层的属性；
 
 不管是 jar 包内还是 jar 运行的同级目录下，只要包含 bootstrap.yml，且为云配置，则云配置文件会覆盖其他配置文件；
+
