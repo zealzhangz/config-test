@@ -103,3 +103,30 @@ spring.cloud.config.server.git.uri
 
 不管是 jar 包内还是 jar 运行的同级目录下，只要包含 bootstrap.yml，且为云配置，则云配置文件会覆盖其他配置文件；
 
+
+### 特别说明
+在指定配置文件时，尽然没发现 `-Dspring.config.location` 和 `--spring.config.location` 区别，一开始以为两个命令是一样的但是发现用 `-Dspring.config.location` 指定目录后没有生效，后面试用了 `--spring.config.location` 才发现生效正确指定目录对的方法如下：
+
+```bash
+➜  test pwd
+/Users/zealzhangz/Desktop/test
+➜  test ls
+application-config.properties  application.properties
+# 正确如下✅
+java -jar rest-1.0-SNAPSHOT.jar --spring.config.location=file:/Users/zealzhangz/Desktop/test/
+# 或如下✅
+java -jar rest-1.0-SNAPSHOT.jar --spring.config.location=file:///Users/zealzhangz/Desktop/test/
+# 错误如下❌，不能加载到配置
+java -jar rest-1.0-SNAPSHOT.jar -Dspring.config.location=file:///Users/zealzhangz/Desktop/test/
+```
+奇怪的问题：
+我单独指定 `application-config.properties` 配置文件发现是不能被加载到的，但是单独指定 `application.properties` 可以加载到里面的内容
+
+```bash
+# 不能加载 application-config.properties（这个配置为jar包内部配置）
+java -jar rest-1.0-SNAPSHOT.jar --spring.config.location=file:///Users/zealzhangz/Desktop/test/application-config.properties
+# 显示的指定两个配置也只能在加载到 application.properties
+java -jar rest-1.0-SNAPSHOT.jar --spring.config.location="file:/Users/zealzhangz/Desktop/test/application.properties,file:/Users/zealzhangz/Desktop/test/application-config.properties"
+# 上面已经验证，直接指定目录都可以加载到
+java -jar rest-1.0-SNAPSHOT.jar --spring.config.location=file:/Users/zealzhangz/Desktop/test/
+```
