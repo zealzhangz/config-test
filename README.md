@@ -89,7 +89,10 @@ spring.cloud.config.server.git.uri
 4. The classpath root
 
 ### 可以通过属性指定加载某一文件
+
 `java -jar rest-1.0-SNAPSHOT.jar --spring.config.location=classpath:/application.properties,classpath:/test.properties`
+
+[官方说明](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html)
 
 当通过spring.config.location 指定一个配置文件时，配置文件的搜索顺序如下：
 1. file:./custom-config/
