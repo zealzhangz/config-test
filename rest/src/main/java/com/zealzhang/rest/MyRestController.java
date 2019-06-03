@@ -2,6 +2,7 @@ package com.zealzhang.rest;
 
 import com.zealzhang.config.MyConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,11 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class MyRestController {
+    @Value("${test}")
+    private String test;
     @Autowired
     private MyConfig myConfig;
 
     @RequestMapping(value = "/config")
     public String getConfig(){
-        return this.myConfig.getValue();
+        return this.myConfig.getValue() + ":" + test;
     }
 }
